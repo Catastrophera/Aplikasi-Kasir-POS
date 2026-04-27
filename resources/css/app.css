@@ -1,0 +1,24 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Inter', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    
+    /* Cheframa Kebab Colors */
+    --color-kebab-red: #E63946;
+    --color-kebab-red-dark: #b81f2a;
+    --color-kebab-dark: #121212;
+    --color-kebab-dark-card: #1E1E1E;
+    --color-kebab-dark-hover: #2D2D2D;
+    --color-kebab-text: #F3F4F6;
+    --color-kebab-text-muted: #9CA3AF;
+}
+
+body {
+    background-color: var(--color-kebab-dark);
+    color: var(--color-kebab-text);
+}

@@ -1,0 +1,16 @@
+{
+    "name": "Cheframa Kebab POS",
+    "short_name": "Cheframa",
+    "description": "Sistem Informasi Manajemen Operasional Cheframa Kebab",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#121212",
+    "theme_color": "#E63946",
+    "icons": [
+        {
+            "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0U2Mzk0NiI+PHBhdGggZD0iTTUgOGgxNE01IDhhMiAyIDAgMTEwLTRoMTRhMiAyIDAgMTEwIDRNNSA4djEwYTIgMiAwIDAwMiAyaDEwYTIgMiAwIDAwMi0yVjhtLTkgNGg0IiBzdHJva2U9IiNGRkYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+",
+            "sizes": "192x192",
+            "type": "image/svg+xml"
+        }
+    ]
+}
