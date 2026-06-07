@@ -10,6 +10,6 @@ class Category extends Model
 
     public function menus()
     {
-        return $this->hasMany(Menu::class, 'category', 'name');
+        return $this->hasMany(Menu::class);
     }
 }

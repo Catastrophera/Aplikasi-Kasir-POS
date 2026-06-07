@@ -41,7 +41,7 @@
     @endif
 
     {{-- Menu Cards grouped by category --}}
-    @foreach($menus->groupBy('category') as $cat => $items)
+    @foreach($menus->groupBy(fn($m) => $m->category?->name ?? 'Umum') as $cat => $items)
     <div class="mb-8">
         <h3 class="text-xl font-bold mb-4 flex items-center">
             <span class="w-8 h-8 bg-[var(--color-kebab-red)] text-white flex items-center justify-center rounded-lg mr-3 shadow-lg text-sm font-black">{{ $loop->iteration }}</span>
@@ -91,9 +91,9 @@
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-xs font-bold text-[var(--color-kebab-text-muted)] uppercase tracking-wider mb-1">Kategori</label>
-                        <select name="category" required class="w-full bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-xl p-3 text-white focus:outline-none focus:border-[var(--color-kebab-red)]">
+                        <select name="category_id" required class="w-full bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-xl p-3 text-white focus:outline-none focus:border-[var(--color-kebab-red)]">
                             @foreach($categories as $cat)
-                            <option value="{{ $cat->name }}">{{ $cat->name }}</option>
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -123,10 +123,10 @@
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-xs font-bold text-[var(--color-kebab-text-muted)] uppercase tracking-wider mb-1">Kategori</label>
-                        <select name="category" required class="w-full bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-xl p-3 text-white focus:outline-none focus:border-[var(--color-kebab-red)]"
-                            x-init="$watch('editMenu', v => { if(v) $el.value = v.category })">
+                        <select name="category_id" required class="w-full bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-xl p-3 text-white focus:outline-none focus:border-[var(--color-kebab-red)]"
+                            x-init="$watch('editMenu', v => { if(v) $el.value = v.category_id })">
                             @foreach($categories as $cat)
-                            <option value="{{ $cat->name }}">{{ $cat->name }}</option>
+                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -167,7 +167,7 @@
                     <div class="flex items-center gap-3">
                         <span class="w-6 h-6 flex items-center justify-center bg-[var(--color-kebab-red)]/20 text-[var(--color-kebab-red)] rounded-lg text-xs font-black">{{ $loop->iteration }}</span>
                         <span class="font-medium text-white text-sm">{{ $cat->name }}</span>
-                        @php $menuCount = $menus->where('category', $cat->name)->count(); @endphp
+                        @php $menuCount = $menus->where('category_id', $cat->id)->count(); @endphp
                         <span class="text-xs text-[var(--color-kebab-text-muted)]">({{ $menuCount }} menu)</span>
                     </div>
                     @if($menuCount === 0)

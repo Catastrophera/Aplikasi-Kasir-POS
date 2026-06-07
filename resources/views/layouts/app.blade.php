@@ -60,7 +60,18 @@
         {{-- Desktop Sidebar Nav --}}
         <div x-data="{
             manajemen: {{ request()->is('menus','management/*') ? 'true' : 'false' }},
-            laporan: {{ request()->is('history','reports*') ? 'true' : 'false' }}
+            laporan: {{ request()->is('history','reports*') ? 'true' : 'false' }},
+            lowStockCount: 0,
+            async fetchLowStockCount() {
+                try {
+                    const res = await fetch('/management/stock/low-alerts');
+                    const data = await res.json();
+                    this.lowStockCount = data.count || 0;
+                } catch (e) {}
+            },
+            init() {
+                this.fetchLowStockCount();
+            }
         }" class="hidden md:flex flex-col flex-1 p-3 overflow-y-auto gap-1">
 
             {{-- Dashboard --}}
@@ -80,13 +91,17 @@
                 <button @click="manajemen = !manajemen" class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl transition-colors font-medium text-sm {{ request()->is('menus','management/*') ? 'bg-[var(--color-kebab-red)]/15 text-[var(--color-kebab-red)]' : 'text-[var(--color-kebab-text-muted)] hover:bg-[var(--color-kebab-dark-hover)] hover:text-white' }}">
                     <div class="flex items-center gap-3">
                         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                        Manajemen
+                        <span>Manajemen</span>
+                        <span x-show="lowStockCount > 0" x-cloak class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] inline-block shrink-0"></span>
                     </div>
                     <svg class="w-4 h-4 transition-transform" :class="manajemen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div x-show="manajemen" x-transition class="mt-1 ml-4 pl-3 border-l border-[var(--color-kebab-dark-hover)] space-y-1">
-                    <a href="/menus" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors {{ request()->is('menus') ? 'text-[var(--color-kebab-red)] font-bold' : 'text-[var(--color-kebab-text-muted)] hover:text-white hover:bg-[var(--color-kebab-dark-hover)]' }}">Barang atau Jasa</a>
-                    <a href="/management/stock" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors {{ request()->is('management/stock') ? 'text-[var(--color-kebab-red)] font-bold' : 'text-[var(--color-kebab-text-muted)] hover:text-white hover:bg-[var(--color-kebab-dark-hover)]' }}">Manajemen Stok</a>
+                    <a href="/menus" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors {{ request()->is('menus') ? 'text-[var(--color-kebab-red)] font-bold' : 'text-[var(--color-kebab-text-muted)] hover:text-white hover:bg-[var(--color-kebab-dark-hover)]' }}">Menu</a>
+                    <a href="/management/stock" class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-colors {{ request()->is('management/stock') ? 'text-[var(--color-kebab-red)] font-bold' : 'text-[var(--color-kebab-text-muted)] hover:text-white hover:bg-[var(--color-kebab-dark-hover)]' }}">
+                        <span>Manajemen Stok</span>
+                        <span x-show="lowStockCount > 0" x-text="lowStockCount" x-cloak class="bg-red-500 text-white font-black text-[10px] px-1.5 py-0.5 rounded-full shadow-[0_0_6px_rgba(239,68,68,0.6)] shrink-0"></span>
+                    </a>
                     <a href="/management/purchases" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors {{ request()->is('management/purchases') ? 'text-[var(--color-kebab-red)] font-bold' : 'text-[var(--color-kebab-text-muted)] hover:text-white hover:bg-[var(--color-kebab-dark-hover)]' }}">Pembelian dari Supplier</a>
                     <a href="/management/contacts" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors {{ request()->is('management/contacts') ? 'text-[var(--color-kebab-red)] font-bold' : 'text-[var(--color-kebab-text-muted)] hover:text-white hover:bg-[var(--color-kebab-dark-hover)]' }}">Pelanggan & Supplier</a>
                 </div>

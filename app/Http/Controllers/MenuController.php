@@ -10,18 +10,17 @@ class MenuController extends Controller
 {
     public function store(Request $request)
     {
-        $validCategories = Category::pluck('name')->toArray();
         $request->validate([
-            'name'     => 'required|string|max:120',
-            'category' => 'required|string|in:' . implode(',', $validCategories),
-            'price'    => 'required|numeric|min:0',
+            'name'        => 'required|string|max:120',
+            'category_id' => 'required|exists:categories,id',
+            'price'       => 'required|numeric|min:0',
         ]);
 
         Menu::create([
-            'name'      => $request->name,
-            'category'  => $request->category,
-            'price'     => $request->price,
-            'is_active' => true,
+            'name'        => $request->name,
+            'category_id' => $request->category_id,
+            'price'       => $request->price,
+            'is_active'   => true,
         ]);
 
         return redirect()->back()->with('success', 'Menu berhasil ditambahkan.');
@@ -30,16 +29,16 @@ class MenuController extends Controller
     public function update(Request $request, Menu $menu)
     {
         $request->validate([
-            'name' => 'required|string',
-            'category' => 'required|string',
-            'price' => 'required|numeric',
+            'name'        => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'price'       => 'required|numeric',
         ]);
 
         $menu->update([
-            'name' => $request->name,
-            'category' => $request->category,
-            'price' => $request->price,
-            'is_active' => $request->has('is_active') ? true : false
+            'name'        => $request->name,
+            'category_id' => $request->category_id,
+            'price'       => $request->price,
+            'is_active'   => $request->has('is_active') ? true : false
         ]);
 
         return redirect()->back()->with('success', 'Menu berhasil diupdate.');

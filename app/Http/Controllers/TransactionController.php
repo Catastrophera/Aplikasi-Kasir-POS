@@ -39,6 +39,16 @@ class TransactionController extends Controller
                     'quantity'       => $item['quantity'],
                     'price'          => $item['price'],
                 ]);
+
+                // Deduct stock of raw materials based on the menu's recipe
+                $menu = Menu::with('recipes.rawMaterial')->find($item['id']);
+                if ($menu && $menu->recipes) {
+                    foreach ($menu->recipes as $recipe) {
+                        if ($recipe->rawMaterial) {
+                            $recipe->rawMaterial->decrement('stock', $recipe->quantity * $item['quantity']);
+                        }
+                    }
+                }
             }
 
             DB::commit();
@@ -57,8 +67,20 @@ class TransactionController extends Controller
 
     public function destroy(Transaction $transaction)
     {
-        $transaction->items()->delete();
-        $transaction->delete();
+        DB::transaction(function () use ($transaction) {
+            foreach ($transaction->items as $item) {
+                $menu = Menu::with('recipes.rawMaterial')->find($item->menu_id);
+                if ($menu && $menu->recipes) {
+                    foreach ($menu->recipes as $recipe) {
+                        if ($recipe->rawMaterial) {
+                            $recipe->rawMaterial->increment('stock', $recipe->quantity * $item->quantity);
+                        }
+                    }
+                }
+            }
+            $transaction->items()->delete();
+            $transaction->delete();
+        });
 
         return redirect()->back()->with('success', 'Transaksi #' . str_pad($transaction->id, 5, '0', STR_PAD_LEFT) . ' berhasil dihapus.');
     }

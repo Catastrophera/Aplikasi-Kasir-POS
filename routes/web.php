@@ -48,7 +48,7 @@ Route::middleware(\App\Http\Middleware\PosAuth::class)->group(function () {
 
     // POS
     Route::get('/pos', function () {
-        $menus      = Menu::where('is_active', true)->orderBy('category')->get();
+        $menus      = Menu::with('category')->where('is_active', true)->get()->sortBy(fn($m) => $m->category?->sort_order ?? 99)->values();
         $categories = Category::orderBy('sort_order')->pluck('name');
         return view('pos', compact('menus', 'categories'));
     });
@@ -59,7 +59,7 @@ Route::middleware(\App\Http\Middleware\PosAuth::class)->group(function () {
 
     // Menus CRUD
     Route::get('/menus', function () {
-        $menus      = Menu::orderBy('category')->get();
+        $menus      = Menu::with('category')->get()->sortBy(fn($m) => $m->category?->sort_order ?? 99);
         $categories = Category::orderBy('sort_order')->get();
         return view('menus.index', compact('menus', 'categories'));
     });
@@ -137,7 +137,16 @@ Route::middleware(\App\Http\Middleware\PosAuth::class)->group(function () {
     // ─── Management ──────────────────────────────────────────────────────────
     Route::resource('/management/contacts', \App\Http\Controllers\ContactController::class);
     Route::resource('/management/purchases', \App\Http\Controllers\PurchaseController::class);
-    Route::get('/management/stock', fn() => view('management.stock'))->name('management.stock');
+    
+    Route::get('/management/stock', [\App\Http\Controllers\RawMaterialController::class, 'index'])->name('management.stock');
+    Route::post('/management/stock/raw-materials', [\App\Http\Controllers\RawMaterialController::class, 'store'])->name('raw-materials.store');
+    Route::put('/management/stock/raw-materials/{rawMaterial}', [\App\Http\Controllers\RawMaterialController::class, 'update'])->name('raw-materials.update');
+    Route::delete('/management/stock/raw-materials/{rawMaterial}', [\App\Http\Controllers\RawMaterialController::class, 'destroy'])->name('raw-materials.destroy');
+    
+    Route::post('/management/stock/recipes', [\App\Http\Controllers\RawMaterialController::class, 'storeRecipe'])->name('recipes.store');
+    Route::delete('/management/stock/recipes/{recipe}', [\App\Http\Controllers\RawMaterialController::class, 'destroyRecipe'])->name('recipes.destroy');
+    
+    Route::get('/management/stock/low-alerts', [\App\Http\Controllers\RawMaterialController::class, 'lowStockAlerts'])->name('stock.low-alerts');
 
     // ─── Laporan Tambahan ─────────────────────────────────────────────────────
     Route::get('/reports/categories', function() {

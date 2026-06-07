@@ -41,10 +41,21 @@
         </div>
 
         <div class="flex-1 overflow-y-auto scrollbar-hide pb-4">
+            {{-- Low Stock Alerts --}}
+            <template x-if="lowStockIngredients.length > 0">
+                <div class="bg-amber-500/10 border border-amber-500/30 text-amber-400 px-4 py-3 rounded-xl mb-4 text-xs font-medium flex items-center gap-3">
+                    <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    <div>
+                        <span class="font-bold">Peringatan Stok:</span> Beberapa bahan baku menipis: 
+                        <span class="font-bold text-white" x-text="lowStockIngredients.map(i => i.name + ' (' + Number(i.stock) + ' ' + i.unit + ')').join(', ')"></span>.
+                    </div>
+                </div>
+            </template>
+
             <div class="grid gap-2 lg:gap-4 pr-1 grid-cols-[repeat(auto-fill,minmax(130px,1fr))] lg:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
                 @foreach($menus as $menu)
                 <button
-                    x-show="(activeCategory === 'Semua' || activeCategory === '{{ $menu->category }}') && matchesSearch('{{ addslashes(strtolower($menu->name)) }}')"
+                    x-show="(activeCategory === 'Semua' || activeCategory === '{{ $menu->category?->name }}') && matchesSearch('{{ addslashes(strtolower($menu->name)) }}')"
                     @click="addToCart({{ $menu->id }}, '{{ addslashes($menu->name) }}', {{ $menu->price }})"
                     class="bg-gradient-to-br from-[var(--color-kebab-dark-card)] to-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-2xl p-2.5 lg:p-4 flex flex-col items-start text-left hover:border-[var(--color-kebab-red)] hover:shadow-[0_0_15px_rgba(230,57,70,0.2)] hover:-translate-y-1 transition-all active:scale-95 h-24 lg:h-28 relative group overflow-hidden">
 
@@ -233,6 +244,21 @@ function posSystem() {
         showPrintModal: false,
         searchQuery: '',
         lastOrder: null,
+        lowStockIngredients: [],
+
+        init() {
+            this.fetchLowStockAlerts();
+        },
+
+        async fetchLowStockAlerts() {
+            try {
+                const res = await fetch('/management/stock/low-alerts');
+                const data = await res.json();
+                this.lowStockIngredients = data.items || [];
+            } catch (e) {
+                console.error('Failed to fetch stock alerts:', e);
+            }
+        },
 
         get totalPrice() {
             return this.cart.reduce((t, i) => t + (i.price * i.quantity), 0);
@@ -296,6 +322,7 @@ function posSystem() {
                     this.paymentMethod = 'Tunai';
                     showToast('✅ Pesanan berhasil disimpan!');
                     this.showPrintModal = true;
+                    this.fetchLowStockAlerts();
                 } else {
                     showToast('❌ Gagal: ' + data.message, 'error');
                 }

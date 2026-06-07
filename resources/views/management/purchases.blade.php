@@ -4,7 +4,7 @@
 @section('content')
 <div x-data="{ 
     showModal: false, 
-    items: [{ name: '', qty: 1, price: 0 }],
+    items: [{ name: '', raw_material_id: '', qty: 1, price: 0 }],
     calculateTotal() {
         return this.items.reduce((sum, item) => sum + (item.qty * item.price), 0);
     }
@@ -83,14 +83,28 @@
                     <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
                         <template x-for="(item, index) in items" :key="index">
                             <div class="flex gap-2 items-center">
-                                <input type="text" :name="'items['+index+'][name]'" required placeholder="Nama barang" x-model="item.name" class="flex-1 bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-lg p-2 text-sm text-white">
-                                <input type="number" :name="'items['+index+'][qty]'" required min="1" placeholder="Qty" x-model="item.qty" class="w-16 bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-lg p-2 text-sm text-white text-center">
-                                <input type="number" :name="'items['+index+'][price]'" required min="0" placeholder="Harga" x-model="item.price" class="w-28 bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-lg p-2 text-sm text-white">
-                                <button type="button" @click="items.length > 1 ? items.splice(index, 1) : null" class="text-red-400">✕</button>
+                                <select :name="'items['+index+'][raw_material_id]'" 
+                                        x-model="item.raw_material_id"
+                                        @change="
+                                            const selected = $el.options[$el.selectedIndex];
+                                            if(selected.value) {
+                                                item.name = selected.text;
+                                            }
+                                        "
+                                        class="bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-lg p-2 text-sm text-white max-w-[200px] outline-none">
+                                    <option value="">Bahan Baku (Pilih jika ada)</option>
+                                    @foreach($rawMaterials as $rm)
+                                    <option value="{{ $rm->id }}">{{ $rm->name }}</option>
+                                    @endforeach
+                                </select>
+                                <input type="text" :name="'items['+index+'][name]'" required placeholder="Nama barang" x-model="item.name" class="flex-1 bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-lg p-2 text-sm text-white outline-none">
+                                <input type="number" :name="'items['+index+'][qty]'" required min="1" placeholder="Qty" x-model="item.qty" class="w-16 bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-lg p-2 text-sm text-white text-center outline-none">
+                                <input type="number" :name="'items['+index+'][price]'" required min="0" placeholder="Harga" x-model="item.price" class="w-28 bg-[var(--color-kebab-dark)] border border-[var(--color-kebab-dark-hover)] rounded-lg p-2 text-sm text-white outline-none">
+                                <button type="button" @click="items.length > 1 ? items.splice(index, 1) : null" class="text-red-400 font-bold px-1">✕</button>
                             </div>
                         </template>
                     </div>
-                    <button type="button" @click="items.push({ name: '', qty: 1, price: 0 })" class="mt-2 text-xs font-bold text-[var(--color-kebab-red)]">+ Tambah Baris</button>
+                    <button type="button" @click="items.push({ name: '', raw_material_id: '', qty: 1, price: 0 })" class="mt-2 text-xs font-bold text-[var(--color-kebab-red)]">+ Tambah Baris</button>
                 </div>
 
                 <div class="mb-4">
